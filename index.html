@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Competence and Unit Dashboard</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+/>
+
+<style>
+/* Respeta "reducir movimiento" */
+@media (prefers-reduced-motion: reduce) {
+.reduce-motion * {
+transition: none !important;
+animation: none !important;
+scroll-behavior: auto !important;
+}
+}
+</style>
+</head>
+
+<body class="bg-gradient-to-b from-gray-50 to-white text-gray-900 font-sans">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 reduce-motion">
+<div class="bg-white/80 backdrop-blur rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8">
+
+<!-- Header pro -->
+<header class="mb-10">
+<div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+<div>
+<div class="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-sm text-orange-700">
+<i class="fa-solid fa-bolt"></i>
+MEDSIR Dashboard
+</div>
+<h1 class="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight">
+Competences & Units
+</h1>
+<p class="mt-2 text-gray-600">
+Browse competencies by division and unit, and inspect behaviors per level.
+</p>
+</div>
+
+<div class="flex gap-2">
+<button
+id="reset"
+class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:scale-[0.99] transition"
+>
+<i class="fa-solid fa-rotate"></i>
+Reset
+</button>
+</div>
+</div>
+</header>
+
+<!-- Unit Details -->
+<section class="mb-12">
+<div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+<div class="flex items-center justify-between gap-4 mb-5">
+<h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-3">
+<span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 border border-orange-100 text-orange-600">
+<i class="fas fa-sitemap"></i>
+</span>
+Unit Details
+</h2>
+
+<span class="hidden sm:inline-flex items-center gap-2 text-sm text-gray-500">
+<span class="inline-flex h-2 w-2 rounded-full bg-orange-400"></span>
+Tip: click a competence row to view details below
+</span>
+</div>
+
+<!-- Toolbar de filtros -->
+<div class="grid gap-4 md:grid-cols-2">
+<div>
+<label for="division" class="block text-sm font-semibold text-gray-700 mb-2">
+Division
+</label>
+<div class="relative">
+<i class="fa-solid fa-building absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+<select
+id="division"
+class="w-full appearance-none rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-10 text-gray-800 shadow-sm focus:outline-none focus:ring-4 focus:ring-orange-100 focus:border-orange-300 transition"
+>
+<option value="">-- Select a Division --</option>
+</select>
+<i class="fa-solid fa-chevron-down pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+</div>
+</div>
+
+<div>
+<label for="unit" class="block text-sm font-semibold text-gray-700 mb-2">
+Unit
+</label>
+<div class="relative">
+<i class="fa-solid fa-diagram-project absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+<select
+id="unit"
+class="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-10 text-gray-800 shadow-sm focus:outline-none focus:ring-4 focus:ring-orange-100 focus:border-orange-300 transition disabled:opacity-70"
+disabled
+>
+<option value="">-- Select a Unit --</option>
+</select>
+<i class="fa-solid fa-chevron-down pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+</div>
+</div>
+</div>
+
+<!-- Tabla de Unit Competences -->
+<div class="mt-8">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-3">
+<span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 border border-orange-100 text-orange-600">
+<i class="fas fa-list-check"></i>
+</span>
+Unit Competences
+</h3>
+<span id="unit-badge" class="text-sm text-gray-500"></span>
+</div>
+
+<div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white">
+<table id="unit-table" class="w-full border-collapse bg-white text-sm" aria-live="polite">
+<thead class="bg-gray-50 text-gray-700 sticky top-0 z-10">
+<tr>
+<th class="px-6 py-3 text-left font-semibold tracking-wide border-b border-gray-200">
+Competence
+</th>
+<th class="px-6 py-3 text-center font-semibold tracking-wide border-b border-gray-200">
+Trainee
+</th>
+<th class="px-6 py-3 text-center font-semibold tracking-wide border-b border-gray-200">
+Associate
+</th>
+<th class="px-6 py-3 text-center font-semibold tracking-wide border-b border-gray-200">
+Specialist
+</th>
+<th class="px-6 py-3 text-center font-semibold tracking-wide border-b border-gray-200">
+Expert
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-100"></tbody>
+</table>
+</div>
+
+<div id="unit-empty" class="mt-4 rounded-xl border border-dashed border-gray-200 bg-gray-50 p-5 text-gray-600 hidden">
+<div class="flex items-start gap-3">
+<span class="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-500">
+<i class="fa-solid fa-circle-info"></i>
+</span>
+<div>
+<p class="font-semibold">No data yet</p>
+<p class="text-sm text-gray-500">Select a division and a unit to view its competences.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Competence Details -->
+<section class="mt-12" id="competence-section">
+<div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+<div class="flex items-center justify-between gap-4 mb-5">
+<h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-3">
+<span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 border border-orange-100 text-orange-600">
+<i class="fas fa-info-circle"></i>
+</span>
+Competence Details
+</h2>
+</div>
+
+<div class="mb-6">
+<label for="competence" class="block text-sm font-semibold text-gray-700 mb-2">
+Competence
+</label>
+<div class="relative">
+<i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+<select
+id="competence"
+class="w-full appearance-none rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-10 text-gray-800 shadow-sm focus:outline-none focus:ring-4 focus:ring-orange-100 focus:border-orange-300 transition"
+>
+<option value="">-- Select a Competence --</option>
+</select>
+<i class="fa-solid fa-chevron-down pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+</div>
+</div>
+
+<div id="competence-empty" class="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-5 text-gray-600">
+<div class="flex items-start gap-3">
+<span class="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-500">
+<i class="fa-solid fa-wand-magic-sparkles"></i>
+</span>
+<div>
+<p class="font-semibold">Pick a competence</p>
+<p class="text-sm text-gray-500">You’ll see its definition and behaviors by level here.</p>
+</div>
+</div>
+</div>
+
+<div id="competence-info" class="hidden">
+<h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-3 flex items-center gap-3 mt-4">
+<span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 border border-orange-100 text-orange-600">
+<i class="fas fa-scroll"></i>
+</span>
+Definition
+</h3>
+<p
+id="competence-definition"
+class="text-base text-gray-700 bg-gradient-to-br from-orange-50 to-white p-6 rounded-2xl border border-orange-100 leading-relaxed shadow-sm"
+></p>
+
+<h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-3 flex items-center gap-3 mt-8">
+<span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 border border-orange-100 text-orange-600">
+<i class="fas fa-chart-line"></i>
+</span>
+Behaviors by Level
+</h3>
+
+<div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white">
+<table id="competence-table" class="w-full border-collapse bg-white text-sm" aria-live="polite">
+<thead class="bg-gray-50 text-gray-700">
+<tr>
+<th class="px-6 py-3 text-left font-semibold tracking-wide border-b border-gray-200">
+Level
+</th>
+<th class="px-6 py-3 text-left font-semibold tracking-wide border-b border-gray-200">
+Behavior
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-100"></tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+
+<script>
+const competences = [
+{
+name: 'Branding',
+definition: 'Develop and execute comprehensive brand strategies that align with business objectives and culture, resonate with target audiences (employees, market), and establish a robust and differentiated brand identity.',
+trainee: 'Understands basic branding concepts; assists in branding activities and follows guidelines.',
+associate: 'Manages branding activities; ensures brand consistency and supports brand initiatives.',
+specialist: 'Leads branding projects; develops branding strategies and implements brand guidelines.',
+expert: 'Oversees branding programs; integrates branding efforts across the organization and measures impact.',
+advisor: 'Expert in branding; shapes branding policies, drives brand loyalty, and mentors others.'
+},
+{
+name: 'Budgeting',
+definition: 'Plan, allocate, and control financial resources, including initial budgeting for potential clinical trials/projects.',
+trainee: 'Assists in budget preparation and monitoring; understands basic financial principles and cost tracking. Requires guidance.',
+associate: 'Prepares and manages budgets for small and medium-size projects; monitors expenditures and performs basic financial analysis. May require supervision.',
+specialist: 'Prepares and manages budgets for large projects confidently; conducts cost-benefit analysis and financial forecasting.',
+expert: 'Oversees budgets for large projects or departments; optimizes financial performance and resource allocation. Supervises other people’s budgets.',
+advisor: 'Expert in budgeting; advises on financial strategy and develops advanced budgeting methodologies.'
+},
+{
+name: 'Client Centricity',
+definition: 'Build and maintain strong relationships with clients (funders) or other stakeholders (PI, sites, employees) to satisfy their needs, guaranteeing long-term, valuable relationships and retention.',
+trainee: 'Provides basic customer support; understands client needs and addresses simple issues.',
+associate: 'Manages customer interactions independently; ensures client satisfaction and resolves common problems. May require supervision.',
+specialist: 'Leads client needs initiatives; develops strategies to improve client experiences and handles escalated issues. Works independently.',
+expert: 'Oversees client needs; integrates client feedback into service improvements and builds strong client relationships.',
+advisor: 'Expert in client centricity; shapes customer policies, drives customer loyalty, and mentors others.'
+},
+{
+name: 'Clinical Data Analysis',
+definition: 'Analyze and interpret clinical data to inform decisions.',
+trainee: 'Conducts basic data analyses and generates reports; understands statistical concepts and tools. Requires guidance.',
+associate: 'Performs advanced analyses; interprets results and identifies significant trends and patterns.',
+specialist: 'Manages complex data analysis; ensures data integrity and applies advanced statistical methods.',
+expert: 'Oversees data analysis initiatives; develops new methodologies and tools for data interpretation.',
+advisor: 'Expert data analyst; mentors others and advances the field of clinical data analysis.'
+},
+{
+name: 'Clinical/Translational Trial Design',
+definition: "Negotiate and adapt oncologists' proposals into attractive and innovative proposals for pharma/biotech.",
+trainee: "Adapts oncologists' proposals with guidance. Requires support in crafting proposals for potential pharma/biotech partners.",
+associate: "Shows improved proficiency in adapting oncologists' proposals. Develops somewhat attractive proposals for pharma/biotech partners with guidance.",
+specialist: "Possesses strong skills in negotiating and adapting oncologists' ideas. Creates attractive and well-structured clinical/translational trial proposals for potential pharma/biotech partners.",
+expert: "Oversees oncologists' proposals proactively. Negotiates and adapts them with a high level of proficiency. Excels in crafting innovative and compelling clinical/translational trial proposals for pharma/biotech partners.",
+advisor: 'Expert in elaborating innovative clinical/translational trial proposals. Inspires a culture of excellence in developing highly attractive and impactful proposals that align with the needs of pharma/biotech partners.'
+},
+{
+name: 'Data Analysis',
+definition: 'Collect, organize, and interpret data to make informed decisions.',
+trainee: 'Understands basic data analysis methods and assists in report preparation.',
+associate: 'Applies data analysis techniques independently and identifies trends.',
+specialist: 'Designs complex data models and interprets patterns to provide actionable insights.',
+expert: 'Leads data analysis projects, ensuring accuracy and relevance of insights provided.',
+advisor: 'Expert in data analysis; mentors others and designs new methodologies for organizational advantage.'
+},
+{
+name: 'Latest Clinical Research',
+definition: 'Stay up-to-date with the latest clinical trials and medical research trends.',
+trainee: 'Familiar with the basics of clinical research and trial methodologies.',
+associate: 'Independently reviews and summarizes recent clinical research findings.',
+specialist: 'Critically evaluates new clinical research and applies it to ongoing projects.',
+expert: 'Leads discussions on clinical research implications and implements findings in workflows.',
+advisor: 'Shapes clinical strategies based on the latest research, mentoring others in the field.'
+},
+{
+name: 'Negotiation',
+definition: 'Effectively reach agreements and resolve disputes in a professional manner.',
+trainee: 'Participates in negotiations with guidance; demonstrates basic understanding of negotiation techniques.',
+associate: 'Conducts negotiations independently, achieving mutually beneficial outcomes.',
+specialist: 'Leads complex negotiations with multiple stakeholders; resolves disputes effectively.',
+expert: 'Mentors others in negotiation strategies and achieves consistently favorable outcomes.',
+advisor: 'Expert negotiator, shaping organizational strategies and building long-term partnerships.'
+},
+{
+name: 'Outreach',
+definition: 'Build and maintain connections with external stakeholders to enhance organizational goals.',
+trainee: 'Assists in outreach initiatives and maintains accurate records of communication.',
+associate: 'Independently manages outreach projects, ensuring effective stakeholder engagement.',
+specialist: 'Develops strategic outreach plans and establishes new partnerships.',
+expert: 'Oversees outreach programs, ensuring alignment with organizational objectives.',
+advisor: 'Inspires a culture of proactive outreach; builds lasting and impactful relationships.'
+},
+{
+name: 'Project Management (includes time management)',
+definition: 'Plan, execute, and complete projects effectively within the constraints of scope, time, and resources.',
+trainee: 'Assists in project planning and ensures deadlines are met with supervision.',
+associate: 'Independently manages small projects, balancing time and resource constraints effectively.',
+specialist: 'Leads medium to large projects, ensuring efficient time and resource allocation.',
+expert: 'Mentors others in project management methodologies; consistently delivers high-quality outcomes.',
+advisor: 'Shapes organizational project management strategies and innovates processes for sustained excellence.'
+},
+{
+name: 'Prospecting (Market Analysis: clients, vendors, potential employees, etc.)',
+definition: 'Identify potential opportunities and analyze markets to find valuable leads.',
+trainee: 'Assists in basic market research and prepares prospecting reports.',
+associate: 'Conducts market analysis independently, identifying key opportunities.',
+specialist: 'Develops advanced prospecting strategies and implements findings to achieve results.',
+expert: 'Leads prospecting initiatives, building a pipeline of valuable leads and partnerships.',
+advisor: 'Expert in prospecting and market analysis; shapes strategies for long-term organizational growth.'
+},
+{
+name: 'Protocol Development',
+definition: 'Create detailed plans for clinical trials and research projects to ensure clear and consistent processes.',
+trainee: 'Assists in drafting protocols under supervision, ensuring compliance with standards.',
+associate: 'Develops protocols independently, ensuring clarity and alignment with objectives.',
+specialist: 'Refines complex protocols and addresses gaps in existing documentation.',
+expert: 'Oversees protocol development across teams and ensures seamless implementation.',
+advisor: 'Expert in protocol development; mentors others and sets new standards for efficiency.'
+},
+{
+name: 'Public Speaking and Presentation',
+definition: 'Convey ideas effectively to an audience through structured presentations.',
+trainee: 'Delivers basic presentations with clear guidance and support.',
+associate: 'Prepares and presents confidently to small groups with minimal supervision.',
+specialist: 'Leads impactful presentations to diverse audiences, adjusting style to suit needs.',
+expert: 'Mentors others in presentation skills and consistently engages audiences.',
+advisor: 'Expert in public speaking; inspires large audiences and represents the organization globally.'
+},
+{
+name: 'Quality Assurance',
+definition: 'Ensure that organizational processes and outputs meet defined quality standards.',
+trainee: 'Assists in quality assurance activities and understands fundamental principles.',
+associate: 'Independently conducts quality checks and addresses minor issues effectively.',
+specialist: 'Leads quality assurance initiatives and develops improvement strategies.',
+expert: 'Mentors others in quality assurance practices and ensures organization-wide compliance.',
+advisor: 'Shapes quality assurance policies and drives a culture of continuous improvement.'
+},
+{
+name: 'Risk Management',
+definition: 'Identify, analyze, and mitigate risks to achieve project and organizational goals.',
+trainee: 'Assists in identifying risks and preparing basic mitigation plans.',
+associate: 'Manages risks independently for small projects, ensuring minimal impact.',
+specialist: 'Leads risk assessments and develops mitigation strategies for complex scenarios.',
+expert: 'Oversees organization-wide risk management and mentors others in best practices.',
+advisor: 'Expert in risk management; shapes strategies to preemptively address potential issues.'
+},
+{
+name: 'Scientific Writing',
+definition: 'Effectively communicate scientific ideas and findings through clear and structured writing.',
+trainee: 'Assists in drafting scientific documents under supervision.',
+associate: 'Prepares scientific reports and papers independently with clarity and precision.',
+specialist: 'Writes complex scientific documents and incorporates constructive feedback effectively.',
+expert: 'Mentors others in scientific writing and ensures high-quality output across teams.',
+advisor: 'Expert in scientific writing; establishes guidelines and represents the organization in major publications.'
+}
+];
+
+const divisions = [
+{
+division: "Business Development",
+units: [
+{
+name: "IST (BD)",
+competences: [
+{ name: "Branding", scores: [1, 1, 2, 2] },
+{ name: "Budgeting", scores: [1, 1, 2, 3] },
+{ name: "Client Centricity", scores: [1, 1, 2, 3] },
+{ name: "Negotiation", scores: [1, 1, 2, 3] },
+{ name: "Prospecting", scores: [1, 1, 2, 3] },
+{ name: "Public Speaking and Presentation", scores: [1, 1, 2, 3] }
+]
+},
+{
+name: "Strategic Services (BD)",
+competences: [
+{ name: "Branding", scores: [1, 1, 2, 3] },
+{ name: "Budgeting", scores: [1, 1, 2, 3] },
+{ name: "Client Centricity", scores: [1, 1, 2, 3] },
+{ name: "Negotiation", scores: [1, 1, 2, 3] },
+{ name: "Prospecting", scores: [1, 1, 2, 3] },
+{ name: "Public Speaking and Presentation", scores: [1, 1, 2, 3] }
+]
+},
+{
+"name": "Communication and Marketing",
+"competences": [
+{ "name": "Branding", "scores": [1, 1, 2, 5] },
+{ "name": "Budgeting", "scores": [1, 2, 4, 5] },
+{ "name": "Data analysis", "scores": [1, 2, 3, 5] },
+{ "name": "Project Management", "scores": [1, 2, 3, 4] },
+{ "name": "Prospecting", "scores": [1, 1, 2, 3] },
+{ "name": "Public Speaking and Presentation", "scores": [3, 3, 3, 3] }
+]
+}
+]
+},
+{
+division: "Thinkers",
+units: [
+{
+name: "Thinkers",
+competences: [
+{ name: "Client Centricity", scores: [1, 1, 2, 3] },
+{ name: "Clinical/Translational Trial Design", scores: [1, 1, 2, 3] },
+{ name: "Data analysis", scores: [1, 1, 2, 2] },
+{ name: "Latest Clinical Research", scores: [1, 1, 2, 2] },
+{ name: "Prospecting", scores: [1, 1, 2, 3] },
+{ name: "Public Speaking and Presentation", scores: [1, 1, 2, 2] }
+]
+}
+]
+},
+{
+division: "Scientific",
+units: [
+{
+name: "Ideas Factory",
+competences: [
+{ name: "Budgeting", scores: [1, 1, 2, 3] },
+{ name: "Client Centricity", scores: [1, 1, 2, 3] },
+{ name: "Clinical/Translational Trial Design", scores: [1, 1, 2, 3] },
+{ name: "Latest Clinical Research", scores: [1, 1, 2, 2] },
+{ name: "Project Management", scores: [1, 1, 2, 3] },
+{ name: "Protocol Development", scores: [1, 1, 2, 3] }
+]
+},
+{
+name: "Data Science",
+competences: [
+{ name: "Clinical Data Analysis (statistics)", scores: [1, 1, 2.5, 4.5] },
+{ name: "Clinical/Translational Trial Design", scores: [1, 1, 2, 3.5] },
+{ name: "Latest Clinical Research", scores: [1, 2, 3, 4] },
+{ name: "Project Management", scores: [1, 1, 2, 3] },
+{ name: "Quality Assurance", scores: [1, 1, 2, 3] },
+{ name: "Risk Management", scores: [1, 1, 2, 3] }
+]
+},
+{
+name: "Scientific Impact",
+competences: [
+{ name: "Branding", scores: [1, 1, 2, 3] },
+{ name: "Data analysis", scores: [1, 1, 2, 3] },
+{ name: "Latest Clinical Research", scores: [1, 1, 2, 3] },
+{ name: "Outreach", scores: [1, 1, 2, 2] },
+{ name: "Quality Assurance", scores: [1, 1, 2, 3] },
+{ name: "Scientific Writing", scores: [1, 1, 2, 3] }
+]
+},
+{
+"name": "Translational",
+"competences": [
+{ "name": "Budgeting", "scores": [1, 1, 2, 3] },
+{ "name": "Clinical/Translational Trial Design", "scores": [1, 1, 2, 3] },
+{ "name": "Latest Clinical Research", "scores": [1, 1, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 2] },
+{ "name": "Prospecting", "scores": [1, 1, 2, 2] },
+{ "name": "Protocol Development", "scores": [1, 1, 2, 3] }
+]
+},
+{
+"name": "Transversal Scientific",
+"competences": [
+{ "name": "Clinical Data Analysis (statistics)", "scores": [1, 1, 2, 3] },
+{ "name": "Clinical/Translational Trial Design", "scores": [1, 1, 2, 3] },
+{ "name": "Latest Clinical Research", "scores": [1, 1, 2, 3] },
+{ "name": "Protocol Development", "scores": [1, 1, 2, 3] },
+{ "name": "Public Speaking and Presentation", "scores": [1, 1, 2, 2] },
+{ "name": "Scientific Writing", "scores": [1, 1, 2, 3] }
+]
+}
+]
+},
+{
+division: "Trial",
+units: [
+{
+name: "Start-up",
+competences: [
+{ name: "Client Centricity", scores: [1, 1, 2, 2] },
+{ name: "Negotiation", scores: [1, 1, 2, 2] },
+{ name: "Project Management", scores: [1, 1, 2, 3.5] },
+{ name: "Prospecting", scores: [1, 1, 2, 2] },
+{ name: "Quality Assurance", scores: [1, 1, 2, 3] },
+{ name: "Risk Management", scores: [1, 1, 2, 3] }
+]
+},
+{
+name: "Patient Management",
+competences: [
+{ name: "Client Centricity", scores: [1, 1, 2, 3] },
+{ name: "Data analysis", scores: [1, 1, 2, 2] },
+{ name: "Project Management", scores: [1, 1, 2, 3] },
+{ name: "Quality Assurance", scores: [1, 1, 2, 3] },
+{ name: "Risk Management", scores: [1, 1, 2, 3] }
+]
+},
+{
+"name": "Trial & Client",
+"competences": [
+{ "name": "Budgeting", "scores": [1, 1, 2, 3] },
+{ "name": "Client Centricity", "scores": [1, 1, 2, 3] },
+{ "name": "Negotiation", "scores": [1, 1, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 2] },
+{ "name": "Quality Assurance", "scores": [1, 1, 2, 3] },
+{ "name": "Risk Management", "scores": [1, 1, 2, 3] }
+]
+},
+]
+},
+{
+division: "Data",
+units: [
+{
+name: "Quality Assurance",
+competences: [
+{ "name": "Latest Clinical Research", "scores": [1, 1, 2, 3] },
+{ "name": "Data analysis", "scores": [1, 1, 2, 3] },
+{ "name": "Outreach", "scores": [1, 1, 2, 3] },
+{ "name": "Quality Assurance", "scores": [1, 2, 3, 4] },
+{ "name": "Risk Management", "scores": [1, 2, 3, 4] },
+{ "name": "Information Security", "scores": [1, 1, 2, 3] }
+]
+},
+{
+name: "Digital Environment",
+competences: [
+{ "name": "Client Centricity", "scores": [1, 1, 2, 3] },
+{ "name": "Data analysis", "scores": [1, 1, 2, 3] },
+{ "name": "Outreach", "scores": [1, 1, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 3] },
+{ "name": "Risk Management", "scores": [1, 2, 3, 4] },
+{ "name": "Information Security", "scores": [1, 2, 3, 4] }
+]
+},
+{
+name: "Data Arquitecture",
+competences: [
+{ "name": "Client Centricity", "scores": [1, 1, 2, 3] },
+{ "name": "Data analysis", "scores": [1, 1, 2, 3] },
+{ "name": "Quality Assurance", "scores": [1, 1, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 3] },
+{ "name": "Risk Management", "scores": [1, 1, 2, 3] },
+{ "name": "Information Security", "scores": [1, 1, 1, 2] }
+]
+},
+]
+},
+{
+"division": "Corporate",
+"units": [
+{
+"name": "Talent",
+"competences": [
+{ "name": "Branding", "scores": [1, 1, 2, 3] },
+{ "name": "Client Centricity", "scores": [1, 1, 2, 3] },
+{ "name": "Negotiation", "scores": [1, 1, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 3] },
+{ "name": "Prospecting", "scores": [1, 1, 2, 3] },
+{ "name": "Public Speaking and Presentation", "scores": [1, 1, 2, 4] }
+]
+},
+{
+"name": "Employee Experience",
+"competences": [
+{ "name": "Client Centricity", "scores": [1, 2, 2, 3] },
+{ "name": "Data analysis", "scores": [1, 2, 2, 3] },
+{ "name": "Outreach", "scores": [1, 2, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 3] },
+{ "name": "Quality Assurance", "scores": [1, 2, 3, 4] },
+{ "name": "Risk Management", "scores": [1, 1, 2, 3] }
+]
+},
+{
+"name": "Learning & Culture",
+"competences": [
+{ "name": "Branding", "scores": [1, 2, 3, 4] },
+{ "name": "Client Centricity", "scores": [1, 2, 3, 4] },
+{ "name": "Negotiation", "scores": [1, 1, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 3] },
+{ "name": "Prospecting", "scores": [1, 1, 2, 3] },
+{ "name": "Public Speaking and Presentation", "scores": [1, 1, 2, 3] }
+]
+},
+{
+"name": "Finance",
+"competences": [
+{ "name": "Client Centricity", "scores": [1, 1, 2, 3] },
+{ "name": "Data analysis", "scores": [1, 1, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 3] },
+{ "name": "Quality Assurance", "scores": [1, 2, 2, 3] },
+{ "name": "Risk Management", "scores": [1, 1, 2, 3] }
+]
+},
+{
+"name": "Legal",
+"competences": [
+{ "name": "Client Centricity", "scores": [1, 1, 2, 3] },
+{ "name": "Negotiation", "scores": [1, 1, 2, 3] },
+{ "name": "Outreach", "scores": [1, 1, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 3] },
+{ "name": "Public Speaking and Presentation", "scores": [1, 1, 2, 3] },
+{ "name": "Risk Management", "scores": [1, 1, 2, 3] }
+]
+},
+{
+"name": "Regulatory",
+"competences": [
+{ "name": "Client Centricity", "scores": [1, 1, 2, 3] },
+{ "name": "Latest Clinical Research", "scores": [1, 1, 2, 3] },
+{ "name": "Outreach", "scores": [1, 1, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 3] },
+{ "name": "Quality Assurance", "scores": [1, 2, 2, 3] },
+{ "name": "Risk Management", "scores": [1, 1, 2, 3] }
+]
+},
+{
+"name": "Strategy & Planning",
+"competences": [
+{ "name": "Budgeting", "scores": [1, 1, 2, 3] },
+{ "name": "Client Centricity", "scores": [1, 1, 2, 4] },
+{ "name": "Data analysis", "scores": [1, 1, 2, 4] },
+{ "name": "Negotiation", "scores": [1, 1, 2, 3] },
+{ "name": "Outreach", "scores": [1, 1, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 3] }
+]
+},
+]
+},
+{
+"division": "Compliance",
+"units": [
+{
+"name": "Compliance",
+"competences": [
+{ "name": "Data analysis", "scores": [1, 1, 2, 3] },
+{ "name": "Negotiation", "scores": [1, 1, 2, 3] },
+{ "name": "Outreach", "scores": [1, 1, 2, 3] },
+{ "name": "Project Management", "scores": [1, 1, 2, 2] },
+{ "name": "Public Speaking and Presentation", "scores": [1, 1, 2, 3] },
+{ "name": "Risk Management", "scores": [1, 1, 2, 3] }
+]
+},
+]
+}
+];
+
+const competenceDropdown = document.getElementById("competence");
+const competenceDefinition = document.getElementById("competence-definition");
+const competenceTableBody = document.querySelector("#competence-table tbody");
+const competenceInfoSection = document.getElementById("competence-info");
+const competenceEmpty = document.getElementById("competence-empty");
+
+const divisionDropdown = document.getElementById("division");
+const unitDropdown = document.getElementById("unit");
+const unitTableBody = document.querySelector("#unit-table tbody");
+const unitEmpty = document.getElementById("unit-empty");
+const unitBadge = document.getElementById("unit-badge");
+
+const resetBtn = document.getElementById("reset");
+
+const prefersReducedMotion =
+window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+
+// Show / hide con animación suave
+const showSection = (element) => {
+element.classList.remove("hidden");
+if (prefersReducedMotion) return;
+element.style.opacity = "0";
+element.style.transition = "opacity 220ms ease-in-out";
+requestAnimationFrame(() => (element.style.opacity = "1"));
+};
+
+const hideSection = (element) => {
+if (prefersReducedMotion) {
+element.classList.add("hidden");
+return;
+}
+element.style.opacity = "0";
+setTimeout(() => {
+element.classList.add("hidden");
+element.style.removeProperty("transition");
+element.style.removeProperty("opacity");
+}, 220);
+};
+
+// Populate Competence Dropdown
+const populateCompetenceDropdown = () => {
+competenceDropdown.innerHTML = '<option value="">-- Select a Competence --</option>';
+
+// orden alfabético (diseño/UX)
+const sorted = competences
+.map((c, i) => ({ c, i }))
+.sort((a, b) => a.c.name.localeCompare(b.c.name));
+
+sorted.forEach(({ c, i }) => {
+const option = document.createElement("option");
+option.value = i;
+option.textContent = c.name;
+competenceDropdown.appendChild(option);
+});
+};
+
+// Populate Division Dropdown
+const populateDivisionDropdown = () => {
+divisions.forEach((division, index) => {
+const option = document.createElement("option");
+option.value = index;
+option.textContent = division.division;
+divisionDropdown.appendChild(option);
+});
+};
+
+// Handle Competence Selection
+competenceDropdown.addEventListener("change", () => {
+const selectedIndex = competenceDropdown.value;
+competenceDefinition.textContent = "";
+competenceTableBody.innerHTML = "";
+
+if (selectedIndex === "") {
+competenceEmpty.classList.remove("hidden");
+hideSection(competenceInfoSection);
+return;
+}
+
+competenceEmpty.classList.add("hidden");
+
+const competence = competences[selectedIndex];
+competenceDefinition.textContent = competence.definition || "Definition not available.";
+
+showSection(competenceInfoSection);
+
+["trainee", "associate", "specialist", "expert", "advisor"].forEach((level, idx) => {
+const behavior = competence[level] || "No behavior defined.";
+
+const row = document.createElement("tr");
+row.className =
+(idx % 2 ? "bg-white" : "bg-gray-50") +
+" hover:bg-orange-50/40 transition-colors";
+
+const tdLevel = document.createElement("td");
+tdLevel.className = "px-6 py-4 font-semibold text-gray-900";
+tdLevel.textContent = level.charAt(0).toUpperCase() + level.slice(1);
+
+const tdBehavior = document.createElement("td");
+tdBehavior.className = "px-6 py-4 text-gray-700";
+tdBehavior.textContent = behavior;
+
+row.appendChild(tdLevel);
+row.appendChild(tdBehavior);
+competenceTableBody.appendChild(row);
+});
+});
+
+// Handle Division Selection
+divisionDropdown.addEventListener("change", () => {
+const selectedDivisionIndex = divisionDropdown.value;
+
+unitDropdown.innerHTML = '<option value="">-- Select a Unit --</option>';
+unitDropdown.disabled = true;
+unitDropdown.classList.add("bg-gray-50");
+
+unitTableBody.innerHTML = "";
+unitBadge.textContent = "";
+unitEmpty.classList.remove("hidden");
+
+if (selectedDivisionIndex === "") return;
+
+const selectedDivision = divisions[selectedDivisionIndex];
+selectedDivision.units.forEach((unit, index) => {
+const option = document.createElement("option");
+option.value = index;
+option.textContent = unit.name;
+unitDropdown.appendChild(option);
+});
+
+unitDropdown.disabled = false;
+unitDropdown.classList.remove("bg-gray-50");
+});
+
+// Render Unit Competences
+unitDropdown.addEventListener("change", () => {
+const selectedDivisionIndex = divisionDropdown.value;
+const selectedUnitIndex = unitDropdown.value;
+unitTableBody.innerHTML = "";
+
+if (selectedUnitIndex === "") {
+unitBadge.textContent = "";
+unitEmpty.classList.remove("hidden");
+return;
+}
+
+unitEmpty.classList.add("hidden");
+
+const selectedUnit = divisions[selectedDivisionIndex].units[selectedUnitIndex];
+unitBadge.textContent = `${divisions[selectedDivisionIndex].division} · ${selectedUnit.name}`;
+
+selectedUnit.competences.forEach((comp, rowIndex) => {
+const row = document.createElement("tr");
+row.className =
+(rowIndex % 2 ? "bg-white" : "bg-gray-50") +
+" hover:bg-orange-50/40 transition-colors";
+
+// Competence Name (diseño: clickable para bajar a details)
+const competenceCell = document.createElement("td");
+competenceCell.className = "px-6 py-4 font-semibold text-gray-900";
+
+const btn = document.createElement("button");
+btn.type = "button";
+btn.className =
+"text-left underline decoration-orange-200 hover:decoration-orange-500 hover:text-orange-700 transition";
+btn.textContent = comp.name;
+
+btn.addEventListener("click", () => {
+// intenta seleccionar esa competence si existe igual (sin normalizar datos, solo UX)
+const idx = competences.findIndex((c) => c.name === comp.name);
+if (idx !== -1) {
+competenceDropdown.value = String(idx);
+competenceDropdown.dispatchEvent(new Event("change"));
+}
+document.getElementById("competence-section").scrollIntoView({
+behavior: prefersReducedMotion ? "auto" : "smooth",
+block: "start",
+});
+});
+
+competenceCell.appendChild(btn);
+row.appendChild(competenceCell);
+
+// Score cells: barra elegante (1 solo color + opacity)
+const levels = ["trainee", "associate", "specialist", "expert"];
+levels.forEach((_, index) => {
+const score = comp.scores[index];
+const scoreCell = document.createElement("td");
+scoreCell.className = "px-6 py-4 text-center align-middle";
+
+const wrap = document.createElement("div");
+wrap.className = "flex flex-col items-center gap-2";
+
+const track = document.createElement("div");
+track.className = "relative w-full max-w-[10rem] h-2 bg-gray-200 rounded-full overflow-hidden";
+
+const bar = document.createElement("div");
+bar.className = "h-full bg-orange-500 rounded-full transition-all duration-500 ease-out";
+bar.style.width = `${(score / 5) * 100}%`;
+bar.style.opacity = String(0.25 + (score / 5) * 0.75);
+
+const label = document.createElement("div");
+label.className = "text-xs font-semibold text-gray-600";
+label.textContent = score;
+
+track.appendChild(bar);
+wrap.appendChild(track);
+wrap.appendChild(label);
+scoreCell.appendChild(wrap);
+row.appendChild(scoreCell);
+});
+
+unitTableBody.appendChild(row);
+});
+});
+
+// Reset UX
+resetBtn.addEventListener("click", () => {
+divisionDropdown.value = "";
+unitDropdown.innerHTML = '<option value="">-- Select a Unit --</option>';
+unitDropdown.value = "";
+unitDropdown.disabled = true;
+unitDropdown.classList.add("bg-gray-50");
+
+unitTableBody.innerHTML = "";
+unitBadge.textContent = "";
+unitEmpty.classList.remove("hidden");
+
+competenceDropdown.value = "";
+competenceDefinition.textContent = "";
+competenceTableBody.innerHTML = "";
+competenceEmpty.classList.remove("hidden");
+hideSection(competenceInfoSection);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+populateCompetenceDropdown();
+populateDivisionDropdown();
+
+unitEmpty.classList.remove("hidden");
+competenceEmpty.classList.remove("hidden");
+});
+</script>
+</div>
+</div>
+</body>
+</html>
